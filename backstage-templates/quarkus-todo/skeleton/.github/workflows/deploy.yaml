@@ -1,0 +1,99 @@
+name: Deploy
+
+on:
+  push:
+    branches: main
+{% raw %}
+concurrency:
+  group: ${{ github.ref }}
+  cancel-in-progress: true
+env:
+{% endraw %}
+  IMAGE: ${{ values.artifact_id }}
+{% raw %}
+  AWS_REGION: ${{ vars.AWS_REGION }}
+  AWS_ROLE_ARN: ${{ vars.AWS_ROLE_ARN }}
+  HUMCTL_VERSION: '0.23.1'
+{% endraw %}
+  APP_NAME: ${{ values.artifact_id }}
+
+{% raw %}
+jobs:
+  deploy:
+    name: Build & Notify Humanitec
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set Tag with SHA
+        run: echo "TAG=`echo $GITHUB_SHA | cut -c 1-7`" >> $GITHUB_ENV
+
+      - name: configure aws credentials
+        uses: aws-actions/configure-aws-credentials@v3
+        with:
+          role-to-assume: ${{ env.AWS_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: login to aws ecr
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+        with:
+          mask-password: 'true'
+
+      - name: create repo if not existing
+        id: create-repo
+        uses: int128/create-ecr-repository-action@v1
+        with:
+          repository: ${{ env.IMAGE }}
+
+      - name: "set CONTAINER_REGISTRY env var"
+        run: |
+          echo "CONTAINER_REGISTRY=$REGISTRY" >> "$GITHUB_ENV"
+        env:
+          REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+
+      - name: Set up JDK 17 for x64
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          architecture: x64
+          cache: 'maven'
+
+      - name: Run the Maven build phase
+        run: mvn package -Dmaven.test.skip=true
+
+      - run: docker build --platform linux/amd64 . -t $CONTAINER_REGISTRY/$IMAGE:$TAG -f ./src/main/docker/Dockerfile.jvm
+
+      - run: docker push $CONTAINER_REGISTRY/$IMAGE:$TAG
+
+      - uses: humanitec/setup-cli-action@v1
+        with:
+          version: ${{ env.HUMCTL_VERSION }}
+
+      - name: Inform Humanitec
+        run: |-
+          humctl create artefact-version \
+            --token ${{ secrets.HUMANITEC_TOKEN }} \
+            --org ${{ vars.HUMANITEC_ORG_ID }} \
+            -t container \
+            -n $CONTAINER_REGISTRY/$IMAGE \
+            --version $TAG \
+            --ref $GITHUB_REF \
+            --commit $GITHUB_SHA
+
+      - name: Deploy using Score
+        run: |
+          humctl score deploy \
+            --token ${{ secrets.HUMANITEC_TOKEN }} \
+            --org ${{ vars.HUMANITEC_ORG_ID }} \
+            --app ${{ env.APP_NAME }} \
+            --env development \
+            -f score.yaml \
+            --extensions humanitec.score.yaml \
+            --workload-source-url "https://github.com/${{ github.repository }}/blob/${{ github.ref_name }}/score.yaml" \
+            --image $CONTAINER_REGISTRY/$IMAGE:$TAG \
+            --message "${{ github.event.head_commit.message }}"
+{% endraw %}

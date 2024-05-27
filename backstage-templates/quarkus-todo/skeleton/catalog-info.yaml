@@ -1,0 +1,17 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: ${{values.artifact_id | dump}}
+  description: ${{values.description | dump}}
+  tags:
+    - java
+    - quarkus
+  annotations:
+    'github.com/project-slug': ${{ values.githubOrgId }}/${{values.artifact_id}}
+    'backstage.io/kubernetes-id': ${{values.artifact_id}}
+    'humanitec.com/orgId': ${{ values.orgId | dump }}
+    'humanitec.com/appId': ${{ values.artifact_id | dump}}
+spec:
+  type: service
+  lifecycle: experimental
+  owner: ${{values.owner | dump}}

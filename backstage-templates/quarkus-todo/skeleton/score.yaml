@@ -1,0 +1,30 @@
+apiVersion: score.dev/v1b1
+
+metadata:
+  name: "${{values.artifact_id}}"
+
+service:
+  ports:
+    www:
+      port: 80 # The port that the service will be exposed on
+      targetPort: 8080 # The port that the container will be listening on
+
+containers:
+  todo:
+    image: . # Set by pipeline
+    variables:
+      QUARKUS_DATASOURCE_USERNAME: ${resources.db.username}
+      QUARKUS_DATASOURCE_JDBC_URL: jdbc:postgresql://${resources.db.host}:${resources.db.port}/${resources.db.name}
+      QUARKUS_DATASOURCE_PASSWORD: ${resources.db.password}  
+
+resources:
+  dns: # We need a DNS record to point to the service 
+    type: dns
+  db:
+    type: postgres    
+  route:
+    type: route
+    params:
+      host: ${resources.dns.host}
+      path: /
+      port: 80

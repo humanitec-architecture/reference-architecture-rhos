@@ -1,0 +1,3 @@
+---
+id: ${{ values.artifact_id | lower | dump }}
+name: ${{ values.artifact_id | dump }}

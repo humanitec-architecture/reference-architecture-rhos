@@ -1,0 +1,22 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: dynamic-plugin-config-rhdh
+  namespace: rhdh
+data:
+  dynamic-plugins.yaml: |
+    includes:
+      - dynamic-plugins.default.yaml
+    plugins:
+      - # update using: npm view @humanitec/backstage-plugin-scaffolder-backend-module-dynamic
+        package: '@humanitec/backstage-plugin-scaffolder-backend-module-dynamic@0.3.0'
+        integrity: 'sha512-r0SCTrs7tUyyBmFpMcHw1MUzN+ad1iviztkBJ55ZCsnRhJNNVb41ucDqkXqjXTBTTvOEt4u0ZsMq0SxVplXfVw=='
+        pluginConfig: {}
+      - # update using: npm view @humanitec/backstage-plugin-dynamic
+        package: '@humanitec/backstage-plugin-dynamic@0.6.0'
+        integrity: 'sha512-va/PfU0+CDQZb3lucDwXQKFfgFbXsj9GcZpAEfTFiXri28uFqBi1rfGpon4G1nIjeiqR3+41iYf/QV6mYNFgHw=='
+        pluginConfig: {}
+      - # update using: npm view @humanitec/backstage-plugin-backend-dynamic
+        package: '@humanitec/backstage-plugin-backend-dynamic@0.6.3'
+        integrity: 'sha512-T8GdT0dAmkgtZPXJRWMQmTvecU52FVrB1mcR14OgDhhkxdPkP5rsOLwHzsM8bUHdQjPYPoRSv4ozW+jfB4pn7w=='
+        pluginConfig: {}

@@ -1,0 +1,36 @@
+schemaVersion: 2.2.0
+metadata:
+  name: quarkus-todo
+components:
+  - name: tooling-container
+    container:
+      env:
+        - name: KUBEDOCK_ENABLED
+          value: 'true'
+        - name: DOCKER_HOST
+          value: 'tcp://127.0.0.1:2475'
+        - name: TESTCONTAINERS_RYUK_DISABLED
+          value: 'true'
+        - name: QUARKUS_DATASOURCE_DEVSERVICES_VOLUMES_  # <-- https://quarkus.io/guides/databases-dev-services#quarkus-datasource-config-group-dev-services-build-time-config_quarkus.datasource.devservices.volumes-volumes
+          value: '/var/lib/postgresql/'
+      image: quay.io/devfile/universal-developer-image:latest
+      memoryRequest: 2Gi
+      memoryLimit: 8Gi
+      cpuRequest: 1000m
+      cpuLimit: 4000m
+      endpoints:
+        - exposure: none
+          name: kubedock
+          protocol: tcp
+          targetPort: 2475      
+commands:
+  - id: run
+    exec:
+      label: '1. Quarkus Dev'
+      component: tooling-container
+      commandLine: mvn quarkus:dev
+  - id: podman-run
+    exec:
+      label: '2. Podman Run Sample'
+      component: tooling-container
+      commandLine: podman run --name httpd -d -p 8080:8080 python python -m http.server 8080

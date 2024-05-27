@@ -1,0 +1,93 @@
+apiVersion: scaffolder.backstage.io/v1beta3
+kind: Template
+metadata:
+  name: quarkus-todo-app
+  title: Quarkus TODO app
+  description: Create a simple TODO app
+  tags:
+    - recommended
+    - java
+    - rest
+    - quarkus
+spec:
+  owner: service@example.com
+  type: service
+
+  parameters:
+    - title: Provide some simple information
+      required:
+        - component_id
+        - owner
+        - description
+      properties:
+        component_id:
+          title: Name
+          type: string
+          description: Unique name of the component
+          ui:autofocus: true
+          ui:options:
+            rows: 5
+          ui:field: ValidateHumanitecAppID
+        description:
+          title: Description
+          type: string
+          description: Help others understand what this website is for.
+        owner:
+          title: Owner
+          type: string
+          description: Owner of the component
+          ui:field: OwnerPicker
+          ui:options:
+            allowedKinds:
+              - Group
+
+  steps:
+    - name: Read Environment
+      id: environment
+      action: humanitec:get-environment
+
+    - id: template
+      name: Code Fetch Skeleton + Template
+      action: fetch:template
+      input:
+        url: ./skeleton
+        copyWithoutTemplating: ['src/main/resources/**/*']
+        values:
+          description: ${{ parameters.description }}
+          artifact_id: ${{ parameters.component_id }}
+          owner: ${{ parameters.owner }}
+          githubOrgId: ${{ steps.environment.output.githubOrgId }}
+          orgId: ${{ steps.environment.output.orgId }}
+
+    - id: publish
+      name: Publish
+      action: publish:github
+      input:
+        allowedHosts: ['github.com']
+        defaultBranch: main
+        description: This is ${{ parameters.component_id }}
+        repoUrl: github.com?owner=${{ steps.environment.output.githubOrgId }}&repo=${{ parameters.component_id }}
+        repoVisibility: public
+        deleteBranchOnMerge: true
+        protectDefaultBranch: false
+
+    - id: humanitec-create-app
+      name: Create Humanitec App
+      action: humanitec:create-app
+      input:
+        appId: ${{ parameters.component_id }}
+
+    - id: register
+      name: Register
+      action: catalog:register
+      input:
+        repoContentsUrl: '${{ steps.publish.output.repoContentsUrl }}'
+        catalogInfoPath: '/catalog-info.yaml'
+
+  output:
+    links:
+      - title: Repository
+        url: ${{ steps.publish.output.remoteUrl }}
+      - title: Open in catalog
+        icon: catalog
+        entityRef: ${{ steps.register.output.entityRef }}

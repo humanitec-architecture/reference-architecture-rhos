@@ -1,0 +1,36 @@
+
+# The API server URL of your OpenShift cluster
+apiserver = ""
+
+# AWS Account (ID) to use
+aws_account_id = ""
+
+# AWS region
+aws_region = ""
+
+# Base domain
+basedomain = ""
+
+# Environment
+environment = "development"
+
+# GitHub org id (required for Backstage and RHDH)
+github_org_id = ""
+
+# Humanitec CI Service User Token (required for Backstage and RHDH)
+humanitec_ci_service_user_token = ""
+
+# Humanitec Organization ID (required for Backstage and RHDH)
+humanitec_org_id = ""
+
+# Path to your kubeconfig file
+kubeconfig = ""
+
+# The context to use from your kubeconfig to connect Terraform providers to the cluster
+kubectx = ""
+
+# Deploy Backstage
+with_backstage = false
+
+# Deploy Red Hat Developer Hub
+with_rhdh = false
