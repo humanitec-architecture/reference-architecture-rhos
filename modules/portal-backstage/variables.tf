@@ -1,8 +1,3 @@
-variable "aws_region" {
-  description = "AWS region"
-  type        = string
-}
-
 variable "humanitec_org_id" {
   description = "Humanitec Organization ID"
   type        = string
@@ -12,6 +7,11 @@ variable "humanitec_ci_service_user_token" {
   description = "Humanitec CI Service User Token"
   type        = string
   sensitive   = true
+}
+
+variable "humanitec_secret_store_id" {
+  description = "Humanitec Secret Store ID"
+  type        = string
 }
 
 variable "github_org_id" {

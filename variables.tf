@@ -1,3 +1,9 @@
+variable "humanitec_org_id" {
+  description = "Humanitec Organization ID"
+  type        = string
+  default     = null
+}
+
 variable "aws_account_id" {
   description = "AWS Account (ID) to use"
   type        = string
@@ -49,18 +55,5 @@ variable "with_rhdh" {
 variable "github_org_id" {
   description = "GitHub org id (required for Backstage and RHDH)"
   type        = string
-  default     = null
-}
-
-variable "humanitec_org_id" {
-  description = "Humanitec Organization ID (required for Backstage and RHDH)"
-  type        = string
-  default     = null
-}
-
-variable "humanitec_ci_service_user_token" {
-  description = "Humanitec CI Service User Token (required for Backstage and RHDH)"
-  type        = string
-  sensitive   = true
   default     = null
 }

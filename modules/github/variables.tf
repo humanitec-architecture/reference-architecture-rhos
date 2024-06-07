@@ -6,22 +6,12 @@ variable "aws_region" {
 variable "humanitec_org_id" {
   description = "Humanitec Organization ID"
   type        = string
-
-  validation {
-    condition     = var.humanitec_org_id != null
-    error_message = "Humanitec Organization ID must not be empty"
-  }
 }
 
 variable "humanitec_ci_service_user_token" {
   description = "Humanitec CI Service User Token"
   type        = string
   sensitive   = true
-
-  validation {
-    condition     = var.humanitec_ci_service_user_token != null
-    error_message = "Humanitec CI Service User Token must not be empty"
-  }
 }
 
 variable "github_org_id" {

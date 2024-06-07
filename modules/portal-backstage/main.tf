@@ -3,100 +3,53 @@ resource "humanitec_application" "backstage" {
   name = "backstage"
 }
 
+locals {
+  secrets = {
+    humanitec-token          = var.humanitec_ci_service_user_token
+    github-app-client-id     = var.github_app_client_id
+    github-app-client-secret = var.github_app_client_secret
+    github-app-private-key   = indent(2, var.github_app_private_key)
+    github-webhook-secret    = var.github_webhook_secret
+  }
+
+  secret_refs = {
+    for key, value in local.secrets : key => {
+      ref     = aws_secretsmanager_secret.backstage_secret[key].id
+      store   = var.humanitec_secret_store_id
+      version = aws_secretsmanager_secret_version.backstage_secret[key].version_id
+    }
+  }
+}
+
+resource "aws_secretsmanager_secret" "backstage_secret" {
+  for_each = local.secrets
+  name     = "humanitec-backstage-${each.key}"
+}
+
+resource "aws_secretsmanager_secret_version" "backstage_secret" {
+  for_each = local.secrets
+
+  secret_id     = aws_secretsmanager_secret.backstage_secret[each.key].id
+  secret_string = each.value
+}
+
 # Configure required values for backstage
 
-resource "humanitec_value" "backstage_github_org_id" {
-  app_id      = humanitec_application.backstage.id
-  key         = "GITHUB_ORG_ID"
-  description = ""
-  value       = var.github_org_id
-  is_secret   = false
-}
+module "portal_backstage" {
+  source = "github.com/humanitec-architecture/shared-terraform-modules?ref=v2024-06-10//modules/portal-backstage"
 
-resource "humanitec_value" "backstage_github_app_id" {
-  app_id      = humanitec_application.backstage.id
-  key         = "GITHUB_APP_ID"
-  description = ""
-  value       = var.github_app_id
-  is_secret   = false
-}
+  cloud_provider = "aws"
 
-resource "humanitec_value" "backstage_github_app_client_id" {
-  app_id      = humanitec_application.backstage.id
-  key         = "GITHUB_APP_CLIENT_ID"
-  description = ""
-  value       = var.github_app_client_id
-  is_secret   = true
-}
+  humanitec_org_id                    = var.humanitec_org_id
+  humanitec_app_id                    = humanitec_application.backstage.id
+  humanitec_ci_service_user_token_ref = local.secret_refs["humanitec-token"]
 
-resource "humanitec_value" "backstage_github_app_client_secret" {
-  app_id      = humanitec_application.backstage.id
-  key         = "GITHUB_APP_CLIENT_SECRET"
-  description = ""
-  value       = var.github_app_client_secret
-  is_secret   = true
-}
-
-resource "humanitec_value" "backstage_github_app_private_key" {
-  app_id      = humanitec_application.backstage.id
-  key         = "GITHUB_APP_PRIVATE_KEY"
-  description = ""
-  value       = indent(2, var.github_app_private_key)
-  is_secret   = true
-}
-
-resource "humanitec_value" "backstage_github_app_webhook_secret" {
-  app_id      = humanitec_application.backstage.id
-  key         = "GITHUB_APP_WEBHOOK_SECRET"
-  description = ""
-  value       = var.github_webhook_secret
-  is_secret   = true
-}
-
-resource "humanitec_value" "backstage_humanitec_org" {
-  app_id      = humanitec_application.backstage.id
-  key         = "HUMANITEC_ORG_ID"
-  description = ""
-  value       = var.humanitec_org_id
-  is_secret   = false
-}
-
-resource "humanitec_value" "backstage_humanitec_token" {
-  app_id      = humanitec_application.backstage.id
-  key         = "HUMANITEC_TOKEN"
-  description = ""
-  value       = var.humanitec_ci_service_user_token
-  is_secret   = true
-}
-
-resource "humanitec_value" "backstage_cloud_provider" {
-  app_id      = humanitec_application.backstage.id
-  key         = "CLOUD_PROVIDER"
-  description = ""
-  value       = local.cloud_provider
-  is_secret   = false
-}
-
-resource "humanitec_value" "aws_default_region" {
-  app_id      = humanitec_application.backstage.id
-  key         = "AWS_DEFAULT_REGION"
-  description = ""
-  value       = var.aws_region
-  is_secret   = false
-}
-
-resource "random_bytes" "backstage_service_to_service_auth_key" {
-  length = 24
-}
-
-resource "humanitec_value" "app_config_backend_auth_keys" {
-  app_id      = humanitec_application.backstage.id
-  key         = "APP_CONFIG_backend_auth_keys"
-  description = "Backstage service-to-service-auth keys"
-  value = jsonencode([{
-    secret = random_bytes.backstage_service_to_service_auth_key.base64
-  }])
-  is_secret = true
+  github_org_id                = var.github_org_id
+  github_app_client_id_ref     = local.secret_refs["github-app-client-id"]
+  github_app_client_secret_ref = local.secret_refs["github-app-client-secret"]
+  github_app_id                = var.github_app_id
+  github_app_private_key_ref   = local.secret_refs["github-app-private-key"]
+  github_webhook_secret_ref    = local.secret_refs["github-webhook-secret"]
 }
 
 # Configure required resources for backstage
@@ -108,9 +61,7 @@ locals {
 # in-cluster postgres
 
 module "backstage_postgres" {
-  # Not pinned as we don't have a release yet
-  # tflint-ignore: terraform_module_pinned_source
-  source = "git::https://github.com/humanitec-architecture/resource-packs-in-cluster.git//humanitec-resource-defs/postgres/basic"
+  source = "github.com/humanitec-architecture/resource-packs-in-cluster?ref=v2024-06-07//humanitec-resource-defs/postgres/basic"
 
   prefix = local.res_def_prefix
 }
@@ -120,6 +71,11 @@ resource "humanitec_resource_definition_criteria" "backstage_postgres" {
   app_id                 = humanitec_application.backstage.id
 
   force_delete = true
+}
+
+locals {
+  regcred_config_res_id = "regcred"
+  regcred_secret_name   = "regcred"
 }
 
 resource "humanitec_resource_definition" "no_scc_for_backstage_app" {
@@ -197,9 +153,21 @@ update:
     path: /spec/serviceAccountName
     value:
       backstage-development-backstage
+  - op: add
+    path: /spec/imagePullSecrets
+    value:
+      - name: ${local.regcred_secret_name}
 EOL
+        # Value should be: - name: $${resources["config.default#${local.regcred_config_res_id}"].outputs.secret_name}
       }
     })
+  }
+
+  provision = {
+    "config.default#${local.regcred_config_res_id}" = {
+      is_dependent     = false
+      match_dependents = false
+    }
   }
 }
 
