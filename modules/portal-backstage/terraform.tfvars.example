@@ -20,6 +20,9 @@ github_webhook_secret = ""
 # Humanitec CI Service User Token
 humanitec_ci_service_user_token = ""
 
+# Humanitec imagepullsecret config resource id
+humanitec_imagepullsecret_config_res_id = ""
+
 # Humanitec Organization ID
 humanitec_org_id = ""
 

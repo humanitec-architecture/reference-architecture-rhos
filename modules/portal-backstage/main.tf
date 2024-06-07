@@ -73,11 +73,6 @@ resource "humanitec_resource_definition_criteria" "backstage_postgres" {
   force_delete = true
 }
 
-locals {
-  regcred_config_res_id = "regcred"
-  regcred_secret_name   = "regcred"
-}
-
 resource "humanitec_resource_definition" "no_scc_for_backstage_app" {
   driver_type = "humanitec/template"
   id          = "no-scc-for-backstage-app"
@@ -156,22 +151,16 @@ update:
   - op: add
     path: /spec/imagePullSecrets
     value:
-      - name: ${local.regcred_secret_name}
+      - name: $${resources["config.default#${var.humanitec_imagepullsecret_config_res_id}"].outputs.secret_name}
 EOL
-        # Value should be: - name: $${resources["config.default#${local.regcred_config_res_id}"].outputs.secret_name}
       }
     })
-  }
-
-  provision = {
-    "config.default#${local.regcred_config_res_id}" = {
-      is_dependent     = false
-      match_dependents = false
-    }
   }
 }
 
 resource "humanitec_resource_definition_criteria" "no_scc_for_backstage_app" {
   resource_definition_id = humanitec_resource_definition.no_scc_for_backstage_app.id
   app_id                 = humanitec_application.backstage.id
+
+  force_delete = true
 }

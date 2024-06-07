@@ -1,0 +1,29 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ArgoCD
+metadata:
+  name: argocd
+  namespace: ${NAMESPACE}
+spec:
+  applicationSet:
+    webhookServer:
+      route:
+        enabled: false # workaround unexpected new value: .object.spec.applicationSet.webhookServer.ingress.enabled: was null, but now cty.False.
+  initialRepositories: |
+    - url: ${REPO_URL}
+      passwordSecret:
+        name: ${REPO_CREDENTIALS_SECRET}
+        key: password
+      usernameSecret:
+        name: ${REPO_CREDENTIALS_SECRET}
+        key: username
+  server:
+    insecure: true
+    route:
+      enabled: true
+      tls:
+        termination: edge
+        insecureEdgeTerminationPolicy: Redirect
+  sso:
+    provider: dex
+    dex:
+      openShiftOAuth: true

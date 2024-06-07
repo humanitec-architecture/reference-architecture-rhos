@@ -1,7 +1,4 @@
 
-# The API server URL of your OpenShift cluster
-apiserver = ""
-
 # AWS Account (ID)
 aws_account_id = ""
 
@@ -10,9 +7,6 @@ aws_region = ""
 
 # Base domain
 basedomain = ""
-
-# Cluster Resource Definition Name
-cluster_res_def_name = "ref-arch"
 
 # Environment
 environment = "development"

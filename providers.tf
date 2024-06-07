@@ -32,6 +32,10 @@ terraform {
       source  = "hashicorp/tls"
       version = "~> 4.0"
     }
+    time = {
+      source  = "hashicorp/time"
+      version = "~> 0.11"
+    }
   }
   required_version = ">= 1.3.0"
 }
