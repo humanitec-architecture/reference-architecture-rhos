@@ -1,40 +1,9 @@
 # RHOS reference architecture
 
-locals {
-  admin_policy_arn = "arn:aws:iam::aws:policy/AdministratorAccess"
-}
-
 # Current AWS Account ID
 data "aws_caller_identity" "current" {}
 
 # User for Humanitec to access the EKS cluster
-
-resource "aws_iam_user" "humanitec_svc" {
-  name = "humanitec_svc_rhos"
-}
-
-resource "aws_iam_user_policy_attachment" "humanitec_svc" {
-  user       = aws_iam_user.humanitec_svc.name
-  policy_arn = local.admin_policy_arn
-}
-
-resource "aws_iam_access_key" "humanitec_svc" {
-  user = aws_iam_user.humanitec_svc.name
-
-  # Ensure that the policy is not deleted before the access key
-  depends_on = [aws_iam_user_policy_attachment.humanitec_svc]
-}
-
-resource "humanitec_registry" "ref-arc-ecr" {
-  id        = "ref-arch-ecr"
-  registry  = "${data.aws_caller_identity.current.account_id}.dkr.ecr.${var.aws_region}.amazonaws.com"
-  type      = "amazon_ecr"
-  enable_ci = false
-  creds = {
-    username = aws_iam_access_key.humanitec_svc.id
-    password = aws_iam_access_key.humanitec_svc.secret
-  }
-}
 
 # Used to access the OpenShift cluster
 resource "kubernetes_namespace_v1" "humanitec_system" {
@@ -149,6 +118,35 @@ resource "humanitec_resource_definition_criteria" "k8s_namespace" {
   resource_definition_id = humanitec_resource_definition.k8s_namespace.id
 }
 
+resource "humanitec_resource_definition" "rhos_dns" {
+  driver_type = "humanitec/template"
+  id          = "rhos-dns"
+  name        = "rhos-dns"
+  type        = "dns"
+
+  driver_inputs = {
+    values_string = jsonencode({
+      templates = {
+        outputs = <<EOL
+host: $${context.app.id}-$${context.env.id}.${var.basedomain}
+EOL
+      }
+    })
+  }
+
+  provision = {
+    ingress = {
+      match_dependents = false
+      is_dependent     = false
+    }
+  }
+}
+
+resource "humanitec_resource_definition_criteria" "rhos_dns" {
+  resource_definition_id = humanitec_resource_definition.rhos_dns.id
+  env_type               = var.environment
+}
+
 # We need this ingress over the HT default because RHOS will only create
 # the route if the ingress class is openshift_default
 resource "humanitec_resource_definition" "rhos_ingress" {
@@ -159,7 +157,11 @@ resource "humanitec_resource_definition" "rhos_ingress" {
 
   driver_inputs = {
     values_string = jsonencode({
-      "ingress_class" = "openshift_default"
+      "class"  = "openshift-default"
+      "no_tls" = true
+      "annotations" = {
+        "route.openshift.io/termination" = "edge"
+      }
     })
   }
 }

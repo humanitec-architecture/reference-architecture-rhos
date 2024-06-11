@@ -4,25 +4,33 @@ terraform {
       source  = "hashicorp/aws"
       version = "~> 5.17"
     }
-    humanitec = {
-      source  = "humanitec/humanitec"
-      version = "~> 1.0"
-    }
     github = {
       source  = "integrations/github"
       version = "~> 5.38"
     }
-    random = {
-      source  = "hashicorp/random"
-      version = "~> 3.5"
+    helm = {
+      source  = "hashicorp/helm"
+      version = "~> 2.13"
+    }
+    humanitec = {
+      source  = "humanitec/humanitec"
+      version = "~> 1.0"
+    }
+    kubectl = {
+      source  = "alekc/kubectl"
+      version = "~> 2.0"
     }
     kubernetes = {
       source  = "hashicorp/kubernetes"
       version = "~> 2.30"
     }
-    helm = {
-      source  = "hashicorp/helm"
-      version = "~> 2.13"
+    random = {
+      source  = "hashicorp/random"
+      version = "~> 3.5"
+    }
+    tls = {
+      source  = "hashicorp/tls"
+      version = "~> 4.0"
     }
   }
   required_version = ">= 1.3.0"
@@ -39,6 +47,11 @@ provider "github" {
 provider "aws" {
   region              = var.aws_region
   allowed_account_ids = [var.aws_account_id]
+}
+
+provider "kubectl" {
+  config_path    = var.kubeconfig
+  config_context = var.kubectx
 }
 
 provider "kubernetes" {

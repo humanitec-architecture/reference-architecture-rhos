@@ -3,10 +3,31 @@
 module "base" {
   source = "./modules/base"
 
-  apiserver   = var.apiserver
-  environment = var.environment
-  basedomain  = var.basedomain
-  aws_region  = var.aws_region
+  apiserver      = var.apiserver
+  environment    = var.environment
+  basedomain     = var.basedomain
+  aws_region     = var.aws_region
+  aws_account_id = var.aws_account_id
+
+  humanitec_org_id = var.humanitec_org_id
+}
+
+# User used for scaffolding and deploying apps
+
+resource "humanitec_user" "deployer" {
+  count = var.with_backstage || var.with_rhdh ? 1 : 0
+
+  name = "deployer"
+  role = "administrator"
+  type = "service"
+}
+
+resource "humanitec_service_user_token" "deployer" {
+  count = var.with_backstage || var.with_rhdh ? 1 : 0
+
+  id          = "deployer"
+  user_id     = humanitec_user.deployer[0].id
+  description = "Used by scaffolding and deploying"
 }
 
 module "github" {
@@ -15,7 +36,7 @@ module "github" {
   source = "./modules/github"
 
   humanitec_org_id                = var.humanitec_org_id
-  humanitec_ci_service_user_token = var.humanitec_ci_service_user_token
+  humanitec_ci_service_user_token = humanitec_service_user_token.deployer[0].token
   aws_region                      = var.aws_region
   github_org_id                   = var.github_org_id
 
@@ -43,9 +64,9 @@ module "portal_backstage" {
 
   source = "./modules/portal-backstage"
 
-  aws_region                      = var.aws_region
   humanitec_org_id                = var.humanitec_org_id
-  humanitec_ci_service_user_token = var.humanitec_ci_service_user_token
+  humanitec_ci_service_user_token = humanitec_service_user_token.deployer[0].token
+  humanitec_secret_store_id       = module.base.humanitec_secret_store_id
 
   github_org_id            = var.github_org_id
   github_app_client_id     = module.github_app[0].client_id
@@ -65,7 +86,7 @@ module "portal_rhdh" {
   source = "./modules/portal-rhdh"
 
   humanitec_org_id                = var.humanitec_org_id
-  humanitec_ci_service_user_token = var.humanitec_ci_service_user_token
+  humanitec_ci_service_user_token = humanitec_service_user_token.deployer[0].token
   basedomain                      = var.basedomain
 
   github_org_id            = var.github_org_id

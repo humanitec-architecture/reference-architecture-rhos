@@ -176,10 +176,10 @@ Both portal solutions require a GitHub connection, which in turn needs:
   export GITHUB_ORG_ID="my-github-org-id"
   ```
 
-* [Node.js](https://nodejs.org) installed locally.
-* Install the GitHub App for Backstage into your GitHub organization using `node create-gh-app/index.js`. Follow the instructions.
-  * “All repositories” ~> Install
-  * “Okay, […] was installed on the […] account.” ~> You can close the window and server.
+* Install the GitHub App for Backstage into your GitHub organization
+  * Run `docker run --rm -it -e GITHUB_ORG_ID -v $(pwd):/pwd -p 127.0.0.1:3000:3000 ghcr.io/humanitec-architecture/create-gh-app` ([image source](https://github.com/humanitec-architecture/create-gh-app/)) and follow the instructions:
+    * “All repositories” ~> Install
+    * “Okay, […] was installed on the […] account.” ~> You can close the window and server.
 
 #### Portal Usage
 
@@ -226,8 +226,16 @@ Once you are finished with the reference architecture, you can remove all provis
 | github | ~> 5.38 |
 | helm | ~> 2.13 |
 | humanitec | ~> 1.0 |
+| kubectl | ~> 2.0 |
 | kubernetes | ~> 2.30 |
 | random | ~> 3.5 |
+| tls | ~> 4.0 |
+
+### Providers
+
+| Name | Version |
+|------|---------|
+| humanitec | ~> 1.0 |
 
 ### Modules
 
@@ -238,6 +246,13 @@ Once you are finished with the reference architecture, you can remove all provis
 | github\_app | ./modules/github-app | n/a |
 | portal\_backstage | ./modules/portal-backstage | n/a |
 | portal\_rhdh | ./modules/portal-rhdh | n/a |
+
+### Resources
+
+| Name | Type |
+|------|------|
+| [humanitec_service_user_token.deployer](https://registry.terraform.io/providers/humanitec/humanitec/latest/docs/resources/service_user_token) | resource |
+| [humanitec_user.deployer](https://registry.terraform.io/providers/humanitec/humanitec/latest/docs/resources/user) | resource |
 
 ### Inputs
 
@@ -251,8 +266,7 @@ Once you are finished with the reference architecture, you can remove all provis
 | kubectx | The context to use from your kubeconfig to connect Terraform providers to the cluster | `string` | n/a | yes |
 | environment | Environment | `string` | `"development"` | no |
 | github\_org\_id | GitHub org id (required for Backstage and RHDH) | `string` | `null` | no |
-| humanitec\_ci\_service\_user\_token | Humanitec CI Service User Token (required for Backstage and RHDH) | `string` | `null` | no |
-| humanitec\_org\_id | Humanitec Organization ID (required for Backstage and RHDH) | `string` | `null` | no |
+| humanitec\_org\_id | Humanitec Organization ID | `string` | `null` | no |
 | with\_backstage | Deploy Backstage | `bool` | `false` | no |
 | with\_rhdh | Deploy Red Hat Developer Hub | `bool` | `false` | no |
 <!-- END_TF_DOCS -->

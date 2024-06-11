@@ -2,6 +2,9 @@
 # The API server URL of your OpenShift cluster
 apiserver = ""
 
+# AWS Account (ID)
+aws_account_id = ""
+
 # AWS region
 aws_region = ""
 
@@ -13,3 +16,9 @@ cluster_res_def_name = "ref-arch"
 
 # Environment
 environment = "development"
+
+# Humanitec Organization ID
+humanitec_org_id = ""
+
+# Humanitec Secret Store ID
+humanitec_secret_store_id = "ref-arch"

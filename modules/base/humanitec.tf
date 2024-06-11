@@ -7,9 +7,7 @@ locals {
 # in-cluster postgres
 
 module "default_postgres" {
-  # Not pinned as we don't have a release yet
-  # tflint-ignore: terraform_module_pinned_source
-  source = "git::https://github.com/humanitec-architecture/resource-packs-in-cluster.git//humanitec-resource-defs/postgres/basic"
+  source = "github.com/humanitec-architecture/resource-packs-in-cluster?ref=v2024-06-07//humanitec-resource-defs/postgres/basic"
 
   prefix = local.res_def_prefix
 }
@@ -20,9 +18,7 @@ resource "humanitec_resource_definition_criteria" "default_postgres" {
 }
 
 module "default_mysql" {
-  # Not pinned as we don't have a release yet
-  # tflint-ignore: terraform_module_pinned_source
-  source = "git::https://github.com/humanitec-architecture/resource-packs-in-cluster.git//humanitec-resource-defs/mysql/basic"
+  source = "github.com/humanitec-architecture/resource-packs-in-cluster?ref=v2024-06-07//humanitec-resource-defs/mysql/basic"
 
   prefix = local.res_def_prefix
 }
