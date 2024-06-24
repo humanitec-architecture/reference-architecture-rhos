@@ -14,6 +14,11 @@ variable "humanitec_secret_store_id" {
   type        = string
 }
 
+variable "humanitec_imagepullsecret_config_res_id" {
+  description = "Humanitec imagepullsecret config resource id"
+  type        = string
+}
+
 variable "github_org_id" {
   description = "GitHub org id"
   type        = string

@@ -15,6 +15,8 @@ module "default_postgres" {
 resource "humanitec_resource_definition_criteria" "default_postgres" {
   resource_definition_id = module.default_postgres.id
   env_type               = var.environment
+
+  force_delete = true
 }
 
 module "default_mysql" {
@@ -26,4 +28,6 @@ module "default_mysql" {
 resource "humanitec_resource_definition_criteria" "default_mysql" {
   resource_definition_id = module.default_mysql.id
   env_type               = var.environment
+
+  force_delete = true
 }

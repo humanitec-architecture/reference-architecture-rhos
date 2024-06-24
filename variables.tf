@@ -57,3 +57,27 @@ variable "github_org_id" {
   type        = string
   default     = null
 }
+
+variable "with_argocd" {
+  description = "Deploy ArgoCD"
+  type        = bool
+  default     = false
+}
+
+variable "github_manifests_username" {
+  description = "GitHub username to pull & push manifests (required for ArgoCD)"
+  type        = string
+  default     = null
+}
+
+variable "github_manifests_password" {
+  description = "GitHub password  to pull & push manifests (required for ArgoCD)"
+  type        = string
+  default     = null
+}
+
+variable "github_manifests_repo" {
+  description = "GitHub repository for manifests (required for ArgoCD)"
+  type        = string
+  default     = "humanitec-app-manifests"
+}

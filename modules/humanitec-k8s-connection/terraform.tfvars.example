@@ -1,0 +1,12 @@
+
+# The API server URL of your OpenShift cluster
+apiserver = ""
+
+# Base domain
+basedomain = ""
+
+# Environment
+environment = "development"
+
+# k8s-cluster resource definition name
+res_def_name = "ref-arch"

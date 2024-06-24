@@ -1,0 +1,18 @@
+
+# Base domain
+basedomain = ""
+
+# Environment
+environment = "development"
+
+# GitHub password to pull & push manifests
+github_manifests_password = ""
+
+# GitHub repository for manifests
+github_manifests_repo = ""
+
+# GitHub username to pull & push manifests
+github_manifests_username = ""
+
+# GitHub org id
+github_org_id = ""

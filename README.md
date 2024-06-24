@@ -64,7 +64,7 @@ By default, the following will be provisioned:
 
 * Resource Definitions in Humanitec for:
   * Kubernetes Cluster
-* AWS IAM objects for using the Elastic Container Registry (ECR)
+* AWS IAM objects for using the Elastic Container Registry (ECR) and AWS Secrets Manager
 
 ### Prerequisites
 
@@ -77,7 +77,7 @@ By default, the following will be provisioned:
 
 The OpenShift Reference Architecture does not make any assumptions where your OpenShift platform runs. The cluster API server has to be publicly accessible.
 
-The Reference Architecture uses [AWS ECR](https://docs.aws.amazon.com/AmazonECR/latest/userguide/what-is-ecr.html) to store container images and therefore requires an AWS account.
+The Reference Architecture uses [AWS ECR](https://docs.aws.amazon.com/AmazonECR/latest/userguide/what-is-ecr.html) to store container images and [AWS Secrets Manager](https://docs.aws.amazon.com/secretsmanager/latest/userguide/intro.html) to store secrets and therefore requires an AWS account.
 
 ### Usage
 
@@ -200,6 +200,38 @@ Both portal solutions require a GitHub connection, which in turn needs:
 * Open the host in your browser.
 * Click the "Create" button and scaffold your first application.
 
+### Enable ArgoCD (optional)
+
+#### ArgoCD Prerequisites
+
+ArgoCD requires a GitHub connection, which in turn needs:
+
+* A GitHub organization and permission to create new repositories in it. Go to <https://github.com/account/organizations/new> to create a new org (the "Free" option is fine). Note: is has to be an organization, a free account is not sufficient.
+* Create a classic github personal access token with `repo`, `workflow`, `delete_repo` and `admin:org` scope [here](https://github.com/settings/tokens).
+* Set the `GITHUB_TOKEN` environment variable to your token.
+
+  ```shell
+  export GITHUB_TOKEN="my-github-token"
+  ```
+
+* Set the `GITHUB_ORG_ID` environment variable to your GitHub organization ID.
+
+  ```shell
+  export GITHUB_ORG_ID="my-github-org-id"
+  ```
+
+#### ArgoCD Usage
+
+* Enable `with_argocd` inside your `terraform.tfvars` and configure the additional variables that a required for ArgoCD.
+* Perform another `terraform apply`
+
+#### Verify ArgoCD setup
+
+* Run `kubectl -n argocd get routes`
+* Open the host in your browser.
+* Select "Log In Via OpenShift"
+* Deploy a Humanitec Application and within a minute you should see a new Application in ArgoCD being synced.
+
 ### Cleaning up
 
 Once you are finished with the reference architecture, you can remove all provisioned infrastructure and the resource definitions created in Humanitec with the following steps:
@@ -229,6 +261,7 @@ Once you are finished with the reference architecture, you can remove all provis
 | kubectl | ~> 2.0 |
 | kubernetes | ~> 2.30 |
 | random | ~> 3.5 |
+| time | ~> 0.11 |
 | tls | ~> 4.0 |
 
 ### Providers
@@ -242,8 +275,10 @@ Once you are finished with the reference architecture, you can remove all provis
 | Name | Source | Version |
 |------|--------|---------|
 | base | ./modules/base | n/a |
-| github | ./modules/github | n/a |
-| github\_app | ./modules/github-app | n/a |
+| cd\_argocd | ./modules/cd-argocd | n/a |
+| github | github.com/humanitec-architecture/reference-architecture-aws | v2024-06-11//modules/github |
+| github\_app | github.com/humanitec-architecture/shared-terraform-modules | v2024-06-10//modules/github-app |
+| humanitec\_k8s\_connection | ./modules/humanitec-k8s-connection | n/a |
 | portal\_backstage | ./modules/portal-backstage | n/a |
 | portal\_rhdh | ./modules/portal-rhdh | n/a |
 
@@ -265,8 +300,12 @@ Once you are finished with the reference architecture, you can remove all provis
 | kubeconfig | Path to your kubeconfig file | `string` | n/a | yes |
 | kubectx | The context to use from your kubeconfig to connect Terraform providers to the cluster | `string` | n/a | yes |
 | environment | Environment | `string` | `"development"` | no |
+| github\_manifests\_password | GitHub password  to pull & push manifests (required for ArgoCD) | `string` | `null` | no |
+| github\_manifests\_repo | GitHub repository for manifests (required for ArgoCD) | `string` | `"humanitec-app-manifests"` | no |
+| github\_manifests\_username | GitHub username to pull & push manifests (required for ArgoCD) | `string` | `null` | no |
 | github\_org\_id | GitHub org id (required for Backstage and RHDH) | `string` | `null` | no |
 | humanitec\_org\_id | Humanitec Organization ID | `string` | `null` | no |
+| with\_argocd | Deploy ArgoCD | `bool` | `false` | no |
 | with\_backstage | Deploy Backstage | `bool` | `false` | no |
 | with\_rhdh | Deploy Red Hat Developer Hub | `bool` | `false` | no |
 <!-- END_TF_DOCS -->
