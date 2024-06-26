@@ -9,14 +9,14 @@ data:
       - dynamic-plugins.default.yaml
     plugins:
       - # update using: npm view @humanitec/backstage-plugin-scaffolder-backend-module-dynamic
-        package: '@humanitec/backstage-plugin-scaffolder-backend-module-dynamic@0.3.0'
-        integrity: 'sha512-r0SCTrs7tUyyBmFpMcHw1MUzN+ad1iviztkBJ55ZCsnRhJNNVb41ucDqkXqjXTBTTvOEt4u0ZsMq0SxVplXfVw=='
+        package: '@humanitec/backstage-plugin-scaffolder-backend-module-dynamic@0.4.0'
+        integrity: 'sha512-sn6PgR0oCix/Nd0MXLoQ5SW00rF+SNmXArNuH/4dns5zLBN8iXXIhwLh8mIEKu7kI1P9pe/WYhGcA1GNSHCO2A=='
         pluginConfig: {}
       - # update using: npm view @humanitec/backstage-plugin-dynamic
-        package: '@humanitec/backstage-plugin-dynamic@0.7.0'
-        integrity: 'sha512-bY0OCkZxQVWWn7dpeV/IBFd3trHlwDZzHyqkFPJp2NcALpxVg51ojQkKNry+WTdqGCQoqQNlhRGTAMJgTZ+q2Q=='
+        package: '@humanitec/backstage-plugin-dynamic@0.8.0'
+        integrity: 'sha512-y3Cfy/+EkjW9hYqg6KOgRJ1mEobjppE1nkSj3cIBHFH1t5JXhqSE2OOxDzxdqvRdApk3e/JufEgTRn1MpcAxhg=='
         pluginConfig: {}
       - # update using: npm view @humanitec/backstage-plugin-backend-dynamic
-        package: '@humanitec/backstage-plugin-backend-dynamic@0.6.3'
-        integrity: 'sha512-T8GdT0dAmkgtZPXJRWMQmTvecU52FVrB1mcR14OgDhhkxdPkP5rsOLwHzsM8bUHdQjPYPoRSv4ozW+jfB4pn7w=='
+        package: '@humanitec/backstage-plugin-backend-dynamic@0.7.0'
+        integrity: 'sha512-zzrNbXvB1BVa/z1jWZQwFH90bXvNM5by1MSj7dZZ5MlcftB6D/G10RYvHar4QjsNx+o6klio5I32yLX6vwOYHA=='
         pluginConfig: {}
