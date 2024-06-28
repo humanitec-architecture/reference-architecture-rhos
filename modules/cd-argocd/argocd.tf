@@ -50,6 +50,10 @@ resource "kubernetes_manifest" "argocd_instance" {
     REPO_CREDENTIALS_SECRET = local.argocd_manifests_repo_credentials_secret_name,
   }))
 
+  field_manager {
+    force_conflicts = true
+  }
+
   depends_on = [
     kubernetes_secret_v1.argocd_manifests_repo_credentials,
     time_sleep.argocd_operator_ready,
@@ -69,6 +73,10 @@ resource "kubernetes_manifest" "argocd_applicationset" {
     NAMESPACE = kubernetes_namespace_v1.argocd.metadata[0].name,
     REPO_URL  = local.git_url,
   }))
+
+  field_manager {
+    force_conflicts = true
+  }
 
   depends_on = [
     time_sleep.argocd_instance_ready,
