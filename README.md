@@ -253,6 +253,7 @@ Once you are finished with the reference architecture, you can remove all provis
 
 | Name | Version |
 |------|---------|
+| terraform | >= 1.0.0 |
 | terraform | >= 1.3.0 |
 | aws | ~> 5.17 |
 | github | ~> 5.38 |
@@ -281,6 +282,7 @@ Once you are finished with the reference architecture, you can remove all provis
 | humanitec\_k8s\_connection | ./modules/humanitec-k8s-connection | n/a |
 | portal\_backstage | ./modules/portal-backstage | n/a |
 | portal\_rhdh | ./modules/portal-rhdh | n/a |
+| terraform\_state\_backend | cloudposse/tfstate-backend/aws | 1.1.1 |
 
 ### Resources
 
