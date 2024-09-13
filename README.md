@@ -68,7 +68,7 @@ By default, the following will be provisioned:
 
 ### Prerequisites
 
-* A Humanitec account with the `Administrator` role in an Organization. Get a [free trial](https://humanitec.com/free-trial?utm_source=github&utm_medium=referral&utm_campaign=aws_refarch_repo) if you are just starting.
+* A Humanitec account with the `Administrator` role in an Organization. Get a [free trial](https://app.humanitec.io/auth/signup) if you are just starting.
 * A Red Hat OpenShift cluster
 * An AWS account
 * [AWS CLI](https://aws.amazon.com/cli/) installed locally
