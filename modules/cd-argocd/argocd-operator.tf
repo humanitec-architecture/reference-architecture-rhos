@@ -55,7 +55,7 @@ resource "kubernetes_manifest" "argocd_operator_subscription" {
       name                = "argocd-operator"
       source              = "community-operators"
       sourceNamespace     = "openshift-marketplace"
-      startingCSV         = "argocd-operator.v0.10.0"
+      startingCSV         = "argocd-operator.v0.13.0"
     }
   }
 }

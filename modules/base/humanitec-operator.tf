@@ -62,7 +62,7 @@ resource "helm_release" "humanitec_operator" {
 
   repository = "oci://ghcr.io/humanitec/charts"
   chart      = "humanitec-operator"
-  version    = "0.2.6"
+  version    = "0.4.0"
   wait       = true
   timeout    = 300
 

@@ -31,3 +31,19 @@ resource "humanitec_resource_definition_criteria" "default_mysql" {
 
   force_delete = true
 }
+
+resource "humanitec_resource_definition" "default_logging" {
+  driver_type = "humanitec/logging-k8s"
+  id          = "default-logging"
+  name        = "default-logging"
+  type        = "logging"
+
+  driver_inputs = {}
+}
+
+resource "humanitec_resource_definition_criteria" "default_logging" {
+  resource_definition_id = humanitec_resource_definition.default_logging.id
+  class                  = "default"
+
+  force_delete = true
+}
